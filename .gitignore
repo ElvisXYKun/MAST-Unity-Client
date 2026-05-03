@@ -30,3 +30,14 @@ Thumbs.db
 *.aab
 *.unitypackage
 /Build/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Unity Logs
+Logs/
+
+# Temporary test scripts
+Assets/Scripts/TestScript.cs
+Assets/Scripts/TestScript.cs.meta
