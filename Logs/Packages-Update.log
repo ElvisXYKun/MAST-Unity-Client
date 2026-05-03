@@ -1,0 +1,14 @@
+
+=== Fri May  1 13:23:22 2026
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were added:
+  com.unity.modules.adaptiveperformance@1.0.0
+  com.unity.modules.vectorgraphics@1.0.0
+The following packages were updated:
+  com.unity.ugui from version 1.0.0 to 2.0.0
+  com.unity.nuget.newtonsoft-json from version 3.2.1 to 3.2.2
+The following packages were removed:
+  com.unity.textmeshpro@3.0.6

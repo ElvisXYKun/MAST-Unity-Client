@@ -1,0 +1,32 @@
+# Unity generated folders
+/Library/
+/Temp/
+/Obj/
+/Build/
+/Builds/
+/Logs/
+/UserSettings/
+/MemoryCaptures/
+/RecordedPlaySessions/
+
+# Unity asset meta files
+*.pidb
+*.suo
+*.tmp
+*.unityproj
+*.sln
+*.csproj
+
+# OS generated files
+.DS_Store
+.DS_Store?
+Thumbs.db
+
+# iOS Build output
+/iOSBuild/
+
+# Unity cache
+*.apk
+*.aab
+*.unitypackage
+/Build/
