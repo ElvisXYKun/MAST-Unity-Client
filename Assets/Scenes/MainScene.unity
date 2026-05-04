@@ -408,6 +408,8 @@ GameObject:
   - component: {fileID: 66942146}
   - component: {fileID: 66942145}
   - component: {fileID: 66942152}
+  - component: {fileID: 66942154}
+  - component: {fileID: 66942153}
   m_Layer: 0
   m_Name: MastManager
   m_TagString: Untagged
@@ -562,6 +564,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bada15d09ab941398226736a8271423, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnityMainThreadDispatcher
+--- !u!114 &66942153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 66942144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7701950911d204ca4bf4c7faf35f55f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MicStreaming
+  sampleRate: 16000
+  chunkLengthSeconds: 1
+--- !u!114 &66942154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 66942144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7f45e937334143ea9b601f687ff6ef4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ARVisualizer
+  enableAR: 1
 --- !u!1 &256423293
 GameObject:
   m_ObjectHideFlags: 0
