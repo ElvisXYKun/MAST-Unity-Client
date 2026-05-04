@@ -41,3 +41,5 @@ Logs/
 # Temporary test scripts
 Assets/Scripts/TestScript.cs
 Assets/Scripts/TestScript.cs.meta
+
+.idea/

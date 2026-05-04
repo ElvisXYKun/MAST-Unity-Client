@@ -2,8 +2,11 @@
   "dependencies": {
     "com.endel.nativewebsocket": "https://github.com/endel/NativeWebSocket.git#upm",
     "com.unity.2d.sprite": "1.0.0",
+    "com.unity.ide.rider": "3.0.40",
     "com.unity.nuget.newtonsoft-json": "3.2.2",
     "com.unity.ugui": "2.0.0",
+    "com.unity.xr.arfoundation": "6.0.2",
+    "com.unity.xr.arkit": "6.0.2",
     "com.unity.modules.adaptiveperformance": "1.0.0",
     "com.unity.modules.jsonserialize": "1.0.0",
     "com.unity.modules.unitywebrequest": "1.0.0",

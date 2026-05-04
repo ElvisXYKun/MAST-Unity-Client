@@ -405,9 +405,9 @@ GameObject:
   - component: {fileID: 66942150}
   - component: {fileID: 66942149}
   - component: {fileID: 66942148}
-  - component: {fileID: 66942147}
   - component: {fileID: 66942146}
   - component: {fileID: 66942145}
+  - component: {fileID: 66942152}
   m_Layer: 0
   m_Name: MastManager
   m_TagString: Untagged
@@ -444,18 +444,6 @@ MonoBehaviour:
   coordinateText: {fileID: 256423295}
   debugText: {fileID: 40731294}
   connectButton: {fileID: 1625155921}
---- !u!114 &66942147
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 66942144}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bada15d09ab941398226736a8271423, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UnityMainThreadDispatcher
 --- !u!114 &66942148
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -484,7 +472,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4124ac6c4bc854476aeaf3b0dc38cb18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MastClient
-  serverIP: 127.0.0.1
+  serverIP: 192.168.3.46
   serverPort: 8080
   OnPositionReceived:
     m_PersistentCalls:
@@ -562,6 +550,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0.34864, y: 0.24405}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &66942152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 66942144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bada15d09ab941398226736a8271423, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnityMainThreadDispatcher
 --- !u!1 &256423293
 GameObject:
   m_ObjectHideFlags: 0
@@ -1602,7 +1602,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 600, y: 400}
   m_SizeDelta: {x: 200, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1625155921

@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using UnityEngine;
 using UnityEngine.Events;
 using NativeWebSocket;
@@ -16,17 +16,21 @@ public class TrackingData
 
 public class MastClient : MonoBehaviour
 {
-    [Header("服务器连接配置")]
+    [Header("Server Settings")]
     public string serverIP = "192.168.1.100";
     public int serverPort = 8080;
 
-    [Header("事件（Inspector 中连接）")]
+    [Header("Events")]
     public UnityEvent<Vector3> OnPositionReceived;
     public UnityEvent<string> OnStatusChanged;
 
-    [HideInInspector] public string debugLog = "等待启动...";
+    [HideInInspector] public string debugLog = "Waiting...";
 
     private WebSocket _webSocket;
+    private readonly ConcurrentQueue<Vector3> _posQueue = new ConcurrentQueue<Vector3>();
+    private readonly ConcurrentQueue<string>  _statusQueue = new ConcurrentQueue<string>();
+    private bool _pendingReconnect = false;
+    private float _reconnectCountdown = -1f;
 
     void Start()
     {
@@ -34,43 +38,76 @@ public class MastClient : MonoBehaviour
         ConnectToServer();
     }
 
+    void Update()
+    {
+        // 1. Process position updates
+        while (_posQueue.TryDequeue(out Vector3 pos))
+            OnPositionReceived?.Invoke(pos);
+
+        // 2. Process status text updates
+        while (_statusQueue.TryDequeue(out string status))
+            OnStatusChanged?.Invoke(status);
+
+        // 3. Process reconnect countdown
+        if (_pendingReconnect)
+        {
+            _pendingReconnect = false;
+            _reconnectCountdown = 5f;
+        }
+        if (_reconnectCountdown > 0f)
+        {
+            _reconnectCountdown -= Time.deltaTime;
+            if (_reconnectCountdown <= 0f)
+            {
+                _reconnectCountdown = -1f;
+                ConnectToServer();
+            }
+        }
+
+        // 4. NativeWebSocket dispatch queue
+#if !UNITY_WEBGL || UNITY_EDITOR
+        _webSocket?.DispatchMessageQueue();
+#endif
+    }
+
     public async void ConnectToServer()
     {
-        // 关闭旧连接
+        _reconnectCountdown = -1f;
+        _pendingReconnect = false;
+
         if (_webSocket != null)
         {
-            try { await _webSocket.Close(); } catch (Exception ex) { Debug.LogWarning("Close error: " + ex.Message); }
+            try { await _webSocket.Close(); } catch { }
         }
 
         string url = $"ws://{serverIP}:{serverPort}/ws/tracking";
         AppendLog("Connecting: " + url);
-        NotifyStatus("[..] Connecting: " + serverIP);
+        _statusQueue.Enqueue("[..] Connecting: " + serverIP);
 
         _webSocket = new WebSocket(url);
 
         _webSocket.OnOpen += () =>
         {
             AppendLog("[OK] Connected");
-            NotifyStatus("[OK] Connected: " + serverIP);
+            _statusQueue.Enqueue("[OK] Connected: " + serverIP);
         };
 
         _webSocket.OnError += (e) =>
         {
-            AppendLog("[ERR] Error: " + e);
-            NotifyStatus("[ERR] " + e);
+            AppendLog("[ERR] " + e);
+            _statusQueue.Enqueue("[ERR] " + e);
         };
 
         _webSocket.OnClose += (e) =>
         {
             AppendLog("Disconnected. Reconnect in 5s");
-            NotifyStatus("[--] Disconnected. Reconnecting...");
-            Invoke(nameof(ConnectToServer), 5f);
+            _statusQueue.Enqueue("[--] Disconnected. Reconnecting...");
+            _pendingReconnect = true;
         };
 
         _webSocket.OnMessage += (bytes) =>
         {
-            string json = System.Text.Encoding.UTF8.GetString(bytes);
-            ProcessMessage(json);
+            ProcessMessage(System.Text.Encoding.UTF8.GetString(bytes));
         };
 
         await _webSocket.Connect();
@@ -84,24 +121,16 @@ public class MastClient : MonoBehaviour
             if (data == null || data.type == "ping") return;
             if (data.fused_position_unity == null || data.fused_position_unity.Length < 3) return;
 
-            Vector3 pos = new Vector3(
+            _posQueue.Enqueue(new Vector3(
                 data.fused_position_unity[0],
                 data.fused_position_unity[1],
                 data.fused_position_unity[2]
-            );
-            UnityMainThreadDispatcher.Instance.Enqueue(() => OnPositionReceived?.Invoke(pos));
+            ));
         }
         catch (Exception e)
         {
-            AppendLog("[ERR] Parse failed: " + e.Message);
+            AppendLog("[ERR] Parse: " + e.Message);
         }
-    }
-
-    void Update()
-    {
-#if !UNITY_WEBGL || UNITY_EDITOR
-        _webSocket?.DispatchMessageQueue();
-#endif
     }
 
     public void SetServerIP(string ip)
@@ -109,22 +138,31 @@ public class MastClient : MonoBehaviour
         serverIP = ip.Trim();
         PlayerPrefs.SetString("MAST_ServerIP", serverIP);
         PlayerPrefs.Save();
+        AppendLog("Set Server IP: " + serverIP);
     }
 
-    void NotifyStatus(string msg)
+    public async void SendData(string message)
     {
-        UnityMainThreadDispatcher.Instance.Enqueue(() => OnStatusChanged?.Invoke(msg));
+        if (_webSocket != null && _webSocket.State == WebSocketState.Open)
+        {
+            try
+            {
+                await _webSocket.SendText(message);
+            }
+            catch (Exception e)
+            {
+                AppendLog("[ERR] SendData: " + e.Message);
+            }
+        }
     }
 
     void AppendLog(string msg)
     {
-        // 屏幕调试日志（最多保留 6 行）
-        debugLog = System.DateTime.Now.ToString("HH:mm:ss") + " " + msg + "\n" + debugLog;
+        debugLog = DateTime.Now.ToString("HH:mm:ss") + " " + msg + "\n" + debugLog;
         var lines = debugLog.Split('\n');
         if (lines.Length > 6)
             debugLog = string.Join("\n", lines, 0, 6);
 
-        // Editor 和开发包才输出 Console 日志，正式 Release 包自动屏蔽
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         Debug.Log("[MAST] " + msg);
 #endif
@@ -133,8 +171,6 @@ public class MastClient : MonoBehaviour
     async void OnApplicationQuit()
     {
         if (_webSocket != null)
-        {
             try { await _webSocket.Close(); } catch { }
-        }
     }
 }
